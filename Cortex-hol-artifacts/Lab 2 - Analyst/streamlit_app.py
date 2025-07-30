@@ -19,10 +19,50 @@ def ensure_session_state():
     if "debug" not in st.session_state:
         st.session_state.debug = False
 
+def check_cortex_availability() -> bool:
+    """Check if Cortex Analyst is available in the current account."""
+    try:
+        # Test with a simple Cortex function first
+        test_result = session.sql("SELECT SNOWFLAKE.CORTEX.COMPLETE('snowflake-arctic', 'test') as test").collect()
+        return True
+    except Exception as e:
+        return False
+
 def send_message(prompt: str) -> dict:
     """Calls the REST API and returns the response."""
     # Ensure session state is properly initialized
     ensure_session_state()
+    
+    # Check if Cortex is available
+    if not check_cortex_availability():
+        error_msg = """
+        🚨 Cortex Analyst is not available in your Snowflake account.
+        
+        **Possible solutions:**
+        1. Contact your Snowflake administrator to enable Cortex
+        2. Ensure you have the CORTEX_USER database role:
+           ```sql
+           GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO USER <your_username>;
+           ```
+        3. Check if your account region supports Cortex Analyst
+        4. Verify your account has the appropriate Snowflake edition
+        
+        **To test Cortex availability, run this SQL:**
+        ```sql
+        SELECT SNOWFLAKE.CORTEX.COMPLETE('snowflake-arctic', 'Hello world');
+        ```
+        """
+        return {
+            "message": {
+                "content": [
+                    {
+                        "type": "text", 
+                        "text": error_msg
+                    }
+                ]
+            },
+            "request_id": "cortex_not_available"
+        }
     
     # Construct the semantic model file path
     semantic_model_path = f"@{st.session_state.database}.{st.session_state.schema}.{st.session_state.stage}/{st.session_state.semantic_model_file}"
@@ -52,11 +92,32 @@ def send_message(prompt: str) -> dict:
         return resp[0].RESPONSE
     
     except Exception as e:
-        st.error(f"Error calling Cortex Analyst: {str(e)}")
-        st.error(f"Semantic model path: {semantic_model_path}")
+        error_msg = f"""
+        ❌ **Cortex Analyst Error**: {str(e)}
+        
+        **Semantic model path**: `{semantic_model_path}`
+        
+        **Common fixes**:
+        1. Ensure Cortex Analyst is enabled: `ALTER ACCOUNT SET CORTEX_ENABLED = TRUE;`
+        2. Grant Cortex permissions: `GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO USER <username>;`
+        3. Verify the semantic model file exists in the stage
+        4. Check your account region supports Cortex Analyst
+        """
+        
         if st.session_state.debug:
-            st.error(f"Full request body: {json.dumps(request_body, indent=2)}")
-        raise e
+            error_msg += f"\n\n**Debug Info**: {json.dumps(request_body, indent=2)}"
+        
+        return {
+            "message": {
+                "content": [
+                    {
+                        "type": "text", 
+                        "text": error_msg
+                    }
+                ]
+            },
+            "request_id": "error"
+        }
 
 def process_message(prompt: str) -> None:
     """Processes a message and adds the response to the chat."""

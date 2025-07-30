@@ -24,6 +24,23 @@ Before starting these labs, ensure you have:
 - Basic familiarity with SQL
 - Understanding of Python fundamentals (for Streamlit apps)
 
+### **🧠 Cortex Requirements**
+
+**Important**: Lab 2 (Cortex Analyst) requires additional setup:
+
+1. **Cortex Access**: Your Snowflake account must have Cortex enabled
+2. **User Privileges**: You need the `CORTEX_USER` database role:
+   ```sql
+   GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO USER <your_username>;
+   ```
+3. **Account Edition**: Cortex Analyst may require specific Snowflake editions
+4. **Regional Availability**: Cortex Analyst is not available in all regions yet
+
+**Test Cortex availability** by running:
+```sql
+SELECT SNOWFLAKE.CORTEX.COMPLETE('snowflake-arctic', 'Hello world');
+```
+
 > **New to Snowflake?** Check out [Snowflake in 20 minutes](https://docs.snowflake.com/en/user-guide/getting-started-tutorial) to get started.
 
 ## 🧪 Labs Overview
