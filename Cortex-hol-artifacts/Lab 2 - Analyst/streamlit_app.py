@@ -32,11 +32,41 @@ st.set_page_config(
 st.title("💰 Wealth Management Analytics Assistant")
 st.write("Powered by Snowflake Cortex Analyst")
 
+def validate_conversation_flow(messages: List[Dict]) -> List[Dict]:
+    """
+    Validate and fix conversation flow to ensure roles alternate properly.
+    
+    Args:
+        messages (List[Dict]): The conversation messages.
+        
+    Returns:
+        List[Dict]: Cleaned conversation with proper role alternation.
+    """
+    if not messages:
+        return []
+    
+    cleaned_messages = []
+    last_role = None
+    
+    for message in messages:
+        current_role = message.get("role")
+        
+        # Skip consecutive messages with the same role
+        if current_role != last_role:
+            cleaned_messages.append(message)
+            last_role = current_role
+    
+    return cleaned_messages
+
 # Session state initialization
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "selected_semantic_model_path" not in st.session_state:
     st.session_state.selected_semantic_model_path = f"{DATABASE}.{SCHEMA}.{STAGE}/{SEMANTIC_MODEL_FILE}"
+
+# Validate existing conversation on app load
+if st.session_state.messages:
+    st.session_state.messages = validate_conversation_flow(st.session_state.messages)
 
 def get_analyst_response(messages: List[Dict]) -> Tuple[Dict, Optional[str]]:
     """
@@ -110,12 +140,14 @@ def process_message(content: str) -> None:
     Args:
         content (str): The user's message content.
     """
-    # Add user message to chat history
+    # Create user message in the correct format
     user_message = {
         "role": "user", 
         "content": [{"type": "text", "text": content}]
     }
-    st.session_state.messages.append(user_message)
+    
+    # Create a temporary conversation including the new user message
+    temp_messages = st.session_state.messages + [user_message]
     
     # Display user message
     with st.chat_message("user"):
@@ -124,8 +156,8 @@ def process_message(content: str) -> None:
     # Get response from Cortex Analyst
     with st.chat_message("assistant"):
         with st.spinner("Analyzing..."):
-            # Call the Cortex Analyst API
-            response, error = get_analyst_response(st.session_state.messages)
+            # Call the Cortex Analyst API with the temporary conversation
+            response, error = get_analyst_response(temp_messages)
             
             if error:
                 st.error(error)
@@ -134,9 +166,9 @@ def process_message(content: str) -> None:
             # Extract the response content
             if "message" in response:
                 assistant_message = response["message"]
-                content = assistant_message.get("content", [])
+                content_items = assistant_message.get("content", [])
                 
-                for item in content:
+                for item in content_items:
                     if item.get("type") == "text":
                         st.markdown(item.get("text", ""))
                     elif item.get("type") == "suggestions":
@@ -149,7 +181,8 @@ def process_message(content: str) -> None:
                         with st.expander("📊 **Generated SQL Query**", expanded=False):
                             st.code(item.get("statement", ""), language="sql")
                 
-                # Add assistant message to chat history
+                # Now add both messages to the conversation history
+                st.session_state.messages.append(user_message)
                 st.session_state.messages.append(assistant_message)
                 
                 # Display request ID for debugging
@@ -178,12 +211,27 @@ with st.sidebar:
     
     for question in sample_questions:
         if st.button(question, key=f"sample_{hash(question)}", use_container_width=True):
-            process_message(question)
+            # Use st.rerun to properly trigger the message processing
+            st.session_state.pending_question = question
+            st.rerun()
     
     # Clear conversation button
     if st.button("🗑️ Clear Conversation", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
+    
+    # Debug section (collapsible)
+    with st.expander("🔧 Debug Info", expanded=False):
+        st.markdown("**Conversation Structure:**")
+        if st.session_state.messages:
+            for i, msg in enumerate(st.session_state.messages):
+                role = msg.get("role", "unknown")
+                st.caption(f"Message {i+1}: {role}")
+        else:
+            st.caption("No messages in conversation")
+        
+        st.markdown(f"**Total messages:** {len(st.session_state.messages)}")
+        st.markdown(f"**Semantic model:** `{st.session_state.selected_semantic_model_path}`")
 
 # Main chat interface
 st.markdown("### 💬 Chat with your wealth management data")
@@ -214,6 +262,12 @@ for message in st.session_state.messages:
                 elif item.get("type") == "sql":
                     with st.expander("📊 **Generated SQL Query**", expanded=False):
                         st.code(item.get("statement", ""), language="sql")
+
+# Handle pending questions from sample buttons
+if "pending_question" in st.session_state:
+    question = st.session_state.pending_question
+    del st.session_state.pending_question
+    process_message(question)
 
 # Chat input
 if prompt := st.chat_input("Ask a question about your wealth management data..."):

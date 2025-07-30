@@ -8,47 +8,45 @@ tables:
       database: "cortex_analyst_demo"
       schema: "wealth_management"
       table: "daily_portfolio_performance"
-    dimensions:
-      - name: date
-        expr: date
-        description: "Date of portfolio performance measurement"
-        data_type: date
-        unique: false
-    measures:
-      - name: daily_portfolio_value
-        expr: portfolio_value
-        description: "Total portfolio value for the given day"
-        synonyms: ["portfolio worth", "account value", "assets"]
-        default_aggregation: sum
-        data_type: number
-      - name: daily_management_fees
-        expr: management_fees
-        description: "Management fees charged for the given day"
-        synonyms: ["fees", "charges", "costs"]
-        default_aggregation: sum
-        data_type: number
-      - name: target_portfolio_value
-        expr: target_portfolio_value
-        description: "Target or benchmark portfolio value for the given day"
-        synonyms: ["target value", "benchmark", "goal"]
-        default_aggregation: sum
-        data_type: number
-      - name: daily_profit
-        description: "Net portfolio performance after fees (portfolio value minus management fees)"
-        expr: portfolio_value - management_fees
-        data_type: number
-        default_aggregation: sum
-      - name: performance_vs_target
-        description: "Difference between actual and target portfolio value"
-        expr: portfolio_value - target_portfolio_value
-        data_type: number
-        default_aggregation: sum
+    primary_key:
+      columns:
+        - date
+        - client_id
+        - advisor_id
     time_dimensions:
       - name: date
         expr: date
         description: "Date with measures of portfolio value, fees, and target performance for each client"
         unique: false
         data_type: date
+    facts:
+      - name: daily_portfolio_value
+        expr: portfolio_value
+        description: "Total portfolio value for the given day"
+        synonyms: ["portfolio worth", "account value", "assets"]
+        data_type: number
+      - name: daily_management_fees
+        expr: management_fees
+        description: "Management fees charged for the given day"
+        synonyms: ["fees", "charges", "costs"]
+        data_type: number
+      - name: target_portfolio_value
+        expr: target_portfolio_value
+        description: "Target or benchmark portfolio value for the given day"
+        synonyms: ["target value", "benchmark", "goal"]
+        data_type: number
+      - name: daily_profit
+        description: "Net portfolio performance after fees (portfolio value minus management fees)"
+        expr: portfolio_value - management_fees
+        data_type: number
+      - name: performance_vs_target
+        description: "Difference between actual and target portfolio value"
+        expr: portfolio_value - target_portfolio_value
+        data_type: number
+    filters:
+      - name: date_range_filter
+        description: "Filter by date range for portfolio performance"
+        expr: date BETWEEN '2024-01-01' AND CURRENT_DATE()
 
   - name: client
     description: "Client information including segment classification"
@@ -56,6 +54,9 @@ tables:
       database: "cortex_analyst_demo"
       schema: "wealth_management"
       table: "client_dim"
+    primary_key:
+      columns:
+        - client_id
     dimensions:
       - name: client_segment
         expr: client_segment
@@ -70,6 +71,12 @@ tables:
           - "Conservative Investor"
           - "Growth Investor"
           - "Institutional"
+        cortex_search_service:
+          service: client_segment_search_service
+    filters:
+      - name: client_segment_filter
+        description: "Filter by client investment segment"
+        expr: client_segment IN ('High Net Worth', 'Ultra High Net Worth', 'Retirement Planning')
 
   - name: advisor
     description: "Financial advisor information including regions, office locations, and individual advisor details"
@@ -77,6 +84,9 @@ tables:
       database: "cortex_analyst_demo"
       schema: "wealth_management"
       table: "advisor_dim"
+    primary_key:
+      columns:
+        - advisor_id
     dimensions:
       - name: advisor_region
         expr: advisor_region
@@ -89,6 +99,8 @@ tables:
           - "Midwest"
           - "West Coast"
           - "Southwest"
+        cortex_search_service:
+          service: advisor_region_search_service
       - name: office_location
         expr: office_location
         description: "Specific office location or city where advisor is based"
@@ -129,17 +141,19 @@ tables:
           - "Tax-Advantaged Strategies"
           - "Conservative Portfolios"
           - "Alternative Investments"
-    measures:
+    facts:
       - name: years_experience
         expr: years_experience
         description: "Years of experience in financial advisory"
         data_type: number
-        default_aggregation: avg
       - name: team_size
         expr: team_size
         description: "Size of the advisor's support team"
         data_type: number
-        default_aggregation: avg
+    filters:
+      - name: advisor_region_filter
+        description: "Filter by advisor geographic region"
+        expr: advisor_region IN ('Northeast', 'Southeast', 'Midwest', 'West Coast', 'Southwest')
 
 relationships:
   - name: performance_to_client
@@ -160,30 +174,13 @@ relationships:
     join_type: left_outer
     relationship_type: many_to_one
 
-filters:
-  - name: client_segment_filter
-    description: "Filter by client investment segment"
-    expr: client_segment
-  - name: advisor_region_filter
-    description: "Filter by advisor geographic region"
-    expr: advisor_region
-  - name: date_range_filter
-    description: "Filter by date range for portfolio performance"
-    expr: date
-
-search_services:
-  - name: client_segment_search_service
-    description: "Search service for client segment values"
-  - name: advisor_region_search_service
-    description: "Search service for advisor region values"
-
 verified_queries:
   - name: "lowest portfolio value each month"
     question: "For each month, what was the lowest daily portfolio value and on what date did that lowest value occur?"
     sql: "WITH monthly_min_portfolio AS (
         SELECT
           DATE_TRUNC('MONTH', date) AS month,
-          MIN(daily_portfolio_value) AS min_portfolio_value
+          MIN(portfolio_value) AS min_portfolio_value
         FROM daily_portfolio_performance
           GROUP BY
             DATE_TRUNC('MONTH', date)
@@ -193,7 +190,7 @@ verified_queries:
           mmp.min_portfolio_value,
           dpp.date AS min_portfolio_date
         FROM monthly_min_portfolio AS mmp JOIN daily_portfolio_performance AS dpp
-          ON mmp.month = DATE_TRUNC('MONTH', dpp.date) AND mmp.min_portfolio_value = dpp.daily_portfolio_value
+          ON mmp.month = DATE_TRUNC('MONTH', dpp.date) AND mmp.min_portfolio_value = dpp.portfolio_value
         ORDER BY mmp.month DESC NULLS LAST"
     verified_at: 1715187400
     verified_by: "Wealth Management Analyst"
