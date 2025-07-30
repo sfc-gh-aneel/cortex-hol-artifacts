@@ -19,6 +19,17 @@ tables:
         description: "Date with measures of portfolio value, fees, and target performance for each client"
         unique: false
         data_type: date
+    dimensions:
+      - name: client_id
+        expr: client_id
+        description: "Client identifier for portfolio performance records"
+        unique: false
+        data_type: number
+      - name: advisor_id
+        expr: advisor_id
+        description: "Advisor identifier for portfolio performance records"
+        unique: false
+        data_type: number
     facts:
       - name: daily_portfolio_value
         expr: portfolio_value
