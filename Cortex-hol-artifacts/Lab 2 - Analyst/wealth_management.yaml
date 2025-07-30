@@ -43,10 +43,6 @@ tables:
         description: "Difference between actual and target portfolio value"
         expr: portfolio_value - target_portfolio_value
         data_type: number
-    filters:
-      - name: date_range_filter
-        description: "Filter by date range for portfolio performance"
-        expr: date BETWEEN '2024-01-01' AND CURRENT_DATE()
 
   - name: client
     description: "Client information including segment classification"
@@ -71,12 +67,6 @@ tables:
           - "Conservative Investor"
           - "Growth Investor"
           - "Institutional"
-        cortex_search_service:
-          service: client_segment_search_service
-    filters:
-      - name: client_segment_filter
-        description: "Filter by client investment segment"
-        expr: client_segment IN ('High Net Worth', 'Ultra High Net Worth', 'Retirement Planning')
 
   - name: advisor
     description: "Financial advisor information including regions, office locations, and individual advisor details"
@@ -99,8 +89,6 @@ tables:
           - "Midwest"
           - "West Coast"
           - "Southwest"
-        cortex_search_service:
-          service: advisor_region_search_service
       - name: office_location
         expr: office_location
         description: "Specific office location or city where advisor is based"
@@ -150,18 +138,13 @@ tables:
         expr: team_size
         description: "Size of the advisor's support team"
         data_type: number
-    filters:
-      - name: advisor_region_filter
-        description: "Filter by advisor geographic region"
-        expr: advisor_region IN ('Northeast', 'Southeast', 'Midwest', 'West Coast', 'Southwest')
 
 relationships:
   - name: performance_to_client
     left_table: daily_portfolio_performance
     right_table: client
     relationship_columns:
-      - left_column: client_id
-        right_column: client_id
+      - client_id
     join_type: left_outer
     relationship_type: many_to_one
 
@@ -169,8 +152,7 @@ relationships:
     left_table: daily_portfolio_performance
     right_table: advisor
     relationship_columns:
-      - left_column: advisor_id
-        right_column: advisor_id
+      - advisor_id
     join_type: left_outer
     relationship_type: many_to_one
 
