@@ -10,9 +10,9 @@ tables:
       table: "daily_portfolio_performance"
     primary_key:
       columns:
-        - date
         - client_id
         - advisor_id
+        - date
     time_dimensions:
       - name: date
         expr: date
