@@ -65,6 +65,11 @@ tables:
       columns:
         - client_id
     dimensions:
+      - name: client_id
+        expr: client_id
+        description: "Unique client identifier"
+        unique: true
+        data_type: number
       - name: client_segment
         expr: client_segment
         description: "Client segment based on wealth and investment goals"
@@ -89,6 +94,11 @@ tables:
       columns:
         - advisor_id
     dimensions:
+      - name: advisor_id
+        expr: advisor_id
+        description: "Unique advisor identifier"
+        unique: true
+        data_type: number
       - name: advisor_region
         expr: advisor_region
         description: "Geographic region where the advisor operates"
