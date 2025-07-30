@@ -177,7 +177,7 @@ def create_visualizations(df: pd.DataFrame, sql_query: str) -> None:
             
             fig_bar = px.bar(agg_df, x=cat_col, y=num_col, 
                             title=f"{num_col} by {cat_col}")
-            fig_bar.update_xaxis(tickangle=45)
+            fig_bar.update_xaxes(tickangle=45)
             st.plotly_chart(fig_bar, use_container_width=True)
         
         # Multiple numeric columns - correlation or comparison
