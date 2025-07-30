@@ -141,23 +141,23 @@ select * from doc_chunks_vectors;
 
 --lets search on it.
 
--- Embed incoming query
+-- Embed incoming prompt
 SET prompt = 'what are the pension consideration for DCG participation';
-CREATE OR REPLACE TABLE query_table (query_vec VECTOR(FLOAT, 768));
-INSERT INTO query_table SELECT SNOWFLAKE.CORTEX.EMBED_TEXT_768('snowflake-arctic-embed-m', $prompt);
+CREATE OR REPLACE TABLE prompt_table (prompt_vec VECTOR(FLOAT, 768));
+INSERT INTO prompt_table SELECT SNOWFLAKE.CORTEX.EMBED_TEXT_768('snowflake-arctic-embed-m', $prompt);
 
 -- Do a semantic search to find the relevant wiki for the query
 WITH result AS (
     SELECT
         w.chunk,
-        $prompt AS query_text,
-        VECTOR_COSINE_SIMILARITY(w.embeddings, q.query_vec) AS similarity
-    FROM doc_chunks_vectors w, query_table q
+        $prompt AS prompt_text,
+        VECTOR_COSINE_SIMILARITY(w.embeddings, q.prompt_vec) AS similarity
+    FROM doc_chunks_vectors w, prompt_table q
     ORDER BY similarity DESC
     LIMIT 1
 )
 
 -- Pass to large language model as context
 SELECT SNOWFLAKE.CORTEX.COMPLETE('mistral-7b',
-    CONCAT('Answer this question: ', query_text, ' using this text: ', chunk)) FROM result;
+    CONCAT('Answer this question: ', prompt_text, ' using this text: ', chunk)) FROM result;
 
