@@ -144,7 +144,8 @@ relationships:
     left_table: daily_portfolio_performance
     right_table: client
     relationship_columns:
-      - client_id
+      - left_column: client_id
+        right_column: client_id
     join_type: left_outer
     relationship_type: many_to_one
 
@@ -152,7 +153,8 @@ relationships:
     left_table: daily_portfolio_performance
     right_table: advisor
     relationship_columns:
-      - advisor_id
+      - left_column: advisor_id
+        right_column: advisor_id
     join_type: left_outer
     relationship_type: many_to_one
 

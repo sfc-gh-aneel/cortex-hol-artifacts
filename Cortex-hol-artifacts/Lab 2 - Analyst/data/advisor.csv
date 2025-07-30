@@ -1,21 +1,21 @@
 advisor_id,advisor_region,office_location,advisor_name,advisor_specialty,years_experience,team_size
-1,Northeast,New York,Sarah Chen,High Net Worth Planning,12,4
-2,West Coast,Los Angeles,Michael Rodriguez,Retirement Planning,8,3
-3,Northeast,Boston,Jennifer Walsh,Estate Planning,15,5
-4,West Coast,San Francisco,David Kim,Growth Investing,6,2
-5,Southeast,Miami,Robert Johnson,Tax-Advantaged Strategies,10,3
-6,Midwest,Chicago,Lisa Thompson,Conservative Portfolios,14,4
-7,Southwest,Dallas,James Martinez,Alternative Investments,9,2
-8,Northeast,New York,Amanda Foster,Ultra High Net Worth,18,6
-9,West Coast,Seattle,Thomas Anderson,Technology Sector Focus,7,3
-10,Southeast,Atlanta,Maria Gonzalez,Retirement Income Planning,11,4
-11,Midwest,Detroit,Kevin O'Brien,Institutional Advisory,13,5
-12,Northeast,Philadelphia,Rachel Green,Young Professional Planning,5,2
-13,West Coast,San Diego,Christopher Lee,International Investments,16,4
-14,Southeast,Charlotte,Nicole Davis,Family Wealth Management,9,3
-15,Southwest,Austin,Andrew Wilson,ESG Investing,8,3
-16,Midwest,Minneapolis,Stephanie Clark,Risk Management,12,4
-17,Northeast,Hartford,Jonathan Brown,Insurance Planning,10,2
-18,West Coast,Portland,Ashley Miller,Socially Responsible Investing,7,3
-19,Southeast,Tampa,Brian Taylor,Small Business Planning,14,4
-20,Southwest,Phoenix,Lauren White,Real Estate Investment,11,3 
+1,Northeast,New York,Sarah Chen,High Net Worth Planning,12,5
+2,Northeast,Boston,Michael Rodriguez,Retirement Planning,8,3
+3,Southeast,Atlanta,Jennifer Walsh,Estate Planning,15,7
+4,Southeast,Miami,David Kim,Growth Investing,6,2
+5,Midwest,Chicago,Robert Johnson,Tax-Advantaged Strategies,10,4
+6,Midwest,Detroit,Emily Davis,Conservative Portfolios,14,6
+7,West Coast,San Francisco,James Wilson,Alternative Investments,9,3
+8,West Coast,Los Angeles,Maria Garcia,High Net Worth Planning,11,5
+9,West Coast,Seattle,Thomas Brown,Growth Investing,7,2
+10,Southwest,Austin,Lisa Anderson,Retirement Planning,13,8
+11,Northeast,Philadelphia,Christopher Lee,Estate Planning,16,9
+12,Southeast,Charlotte,Amanda Miller,Conservative Portfolios,5,2
+13,Midwest,Minneapolis,Daniel Taylor,Tax-Advantaged Strategies,9,4
+14,West Coast,Portland,Rachel White,Alternative Investments,12,6
+15,Southwest,Phoenix,Matthew Martinez,High Net Worth Planning,8,3
+16,Northeast,Hartford,Jessica Thompson,Retirement Planning,14,7
+17,Southeast,Nashville,Andrew Clark,Growth Investing,6,2
+18,Midwest,Kansas City,Nicole Lewis,Estate Planning,11,5
+19,West Coast,San Diego,Kevin Hall,Conservative Portfolios,10,4
+20,Southwest,Dallas,Stephanie Young,Tax-Advantaged Strategies,15,8 

@@ -63,10 +63,26 @@ Build an intelligent chatbot that can answer questions about PDF documents using
 
 **Based on**: [Snowflake Tutorial 3: Build a PDF chatbot with Cortex Search](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/tutorials/cortex-search-tutorial-3-chat-advanced)
 
-### Lab 2: Cortex Analyst for Business Intelligence *(Coming Soon)*
+### Lab 2: Cortex Analyst for Business Intelligence ✅
 **Location**: `Cortex-hol-artifacts/Lab 2 - Analyst/`
 
-Learn to use Cortex Analyst for natural language business intelligence and reporting.
+Build a conversational analytics interface using Cortex Analyst for wealth management data.
+
+**What you'll build**:
+- Natural language query interface for financial data
+- Semantic model mapping business terminology to database schema
+- Streamlit-in-Snowflake conversational analytics app
+- Relationship analysis across portfolios, clients, and advisors
+
+**Key files**:
+- `Lab2_setup.sql` - Database setup and table creation
+- `wealth_management.yaml` - Semantic model definition  
+- `streamlit_app.py` - Conversational analytics application
+- `data/` - Sample CSV datasets (600+ records)
+
+**Dataset**: 600+ daily portfolio records, 50 clients across wealth segments, 20 financial advisors
+
+**Based on**: [Snowflake Quickstart: Getting Started with Cortex Analyst](https://quickstarts.snowflake.com/guide/getting_started_with_cortex_analyst/)
 
 ### Lab 3: Advanced Text Processing with Cortex Functions *(Coming Soon)*
 **Location**: `Cortex-hol-artifacts/Lab 3 - Text Processing/`
@@ -86,9 +102,16 @@ Explore Cortex utility functions for embedding, sentiment analysis, and text gen
    - Ensure you have the necessary privileges listed in prerequisites
    - Note your account identifier and region
 
-3. **Start with Lab 1**:
+3. **Choose your lab**:
+   
+   **Start with Lab 1 (Search)**:
    ```bash
    cd "Cortex-hol-artifacts/Lab 1 - Search"
+   ```
+   
+   **Or try Lab 2 (Analyst)**:
+   ```bash
+   cd "Cortex-hol-artifacts/Lab 2 - Analyst"
    ```
 
 ## 📚 Cortex Features Reference
