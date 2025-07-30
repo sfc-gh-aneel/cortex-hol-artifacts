@@ -1,297 +1,228 @@
 import streamlit as st
-import snowflake.snowpark.context as snowpark_context
-import json
 import pandas as pd
+from snowflake.snowpark.context import get_active_session
+import json
+from typing import List, Dict, Tuple, Optional
+from snowflake.snowpark import Session
+import time
 
-# Get current Snowflake session
-session = snowpark_context.get_active_session()
+# Import the internal Snowflake module for API requests
+import _snowflake
 
-def ensure_session_state():
-    """Ensure all required session state variables are initialized."""
-    if "database" not in st.session_state:
-        st.session_state.database = "CORTEX_ANALYST_DEMO"
-    if "schema" not in st.session_state:
-        st.session_state.schema = "WEALTH_MANAGEMENT"
-    if "stage" not in st.session_state:
-        st.session_state.stage = "RAW_DATA"
-    if "semantic_model_file" not in st.session_state:
-        st.session_state.semantic_model_file = "wealth_management.yaml"
-    if "debug" not in st.session_state:
-        st.session_state.debug = False
+# Initialize Snowpark session
+session = get_active_session()
 
-def check_cortex_availability() -> bool:
-    """Check if Cortex Analyst is available in the current account."""
-    try:
-        # Test with a simple Cortex function first
-        test_result = session.sql("SELECT SNOWFLAKE.CORTEX.COMPLETE('snowflake-arctic', 'test') as test").collect()
-        return True
-    except Exception as e:
-        return False
+# API configuration
+API_ENDPOINT = "/api/v2/cortex/analyst/message"
+API_TIMEOUT = 10 * 60 * 1000  # 10 minutes in milliseconds
 
-def send_message(prompt: str) -> dict:
-    """Calls the REST API and returns the response."""
-    # Ensure session state is properly initialized
-    ensure_session_state()
+# Database configuration - customize these for your setup
+DATABASE = "CORTEX_ANALYST_DEMO"
+SCHEMA = "WEALTH_MANAGEMENT"  
+STAGE = "RAW_DATA"
+SEMANTIC_MODEL_FILE = "wealth_management.yaml"
+
+# Page configuration
+st.set_page_config(
+    page_title="Wealth Management Analytics Assistant",
+    page_icon="💰",
+    layout="wide"
+)
+
+st.title("💰 Wealth Management Analytics Assistant")
+st.write("Powered by Snowflake Cortex Analyst")
+
+# Session state initialization
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+if "selected_semantic_model_path" not in st.session_state:
+    st.session_state.selected_semantic_model_path = f"{DATABASE}.{SCHEMA}.{STAGE}/{SEMANTIC_MODEL_FILE}"
+
+def get_analyst_response(messages: List[Dict]) -> Tuple[Dict, Optional[str]]:
+    """
+    Send chat history to the Cortex Analyst API and return the response.
     
-    # Check if Cortex is available
-    if not check_cortex_availability():
-        error_msg = """
-        🚨 Cortex Analyst is not available in your Snowflake account.
+    Args:
+        messages (List[Dict]): The conversation history.
         
-        **Possible solutions:**
-        1. Contact your Snowflake administrator to enable Cortex
-        2. Ensure you have the CORTEX_USER database role:
-           ```sql
-           GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO USER <your_username>;
-           ```
-        3. Check if your account region supports Cortex Analyst
-        4. Verify your account has the appropriate Snowflake edition
-        
-        **To test Cortex availability, run this SQL:**
-        ```sql
-        SELECT SNOWFLAKE.CORTEX.COMPLETE('snowflake-arctic', 'Hello world');
-        ```
-        """
-        return {
-            "message": {
-                "content": [
-                    {
-                        "type": "text", 
-                        "text": error_msg
-                    }
-                ]
-            },
-            "request_id": "cortex_not_available"
-        }
-    
-    # Construct the semantic model file path
-    semantic_model_path = f"@{st.session_state.database}.{st.session_state.schema}.{st.session_state.stage}/{st.session_state.semantic_model_file}"
-    
+    Returns:
+        Tuple[Dict, Optional[str]]: The response from the Cortex Analyst API and any error message.
+    """
+    # Prepare the request body with the user's prompt
     request_body = {
-        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}],
-        "semantic_model_file": semantic_model_path,
+        "messages": messages,
+        "semantic_model_file": f"@{st.session_state.selected_semantic_model_path}",
     }
     
-    # Display debug information
-    if st.session_state.debug:
-        st.sidebar.text(f"Semantic Model Path: {semantic_model_path}")
-        st.sidebar.text(f"Request Body: {json.dumps(request_body, indent=2)}")
-    
     try:
-        resp = session.sql(
-            "SELECT SNOWFLAKE.CORTEX.ANALYST(parse_json(?)) as response",
-            params=[json.dumps(request_body)]
-        ).collect()
+        # Send a POST request to the Cortex Analyst API endpoint
+        resp = _snowflake.send_snow_api_request(
+            "POST",  # method
+            API_ENDPOINT,  # path
+            {},  # headers
+            {},  # params
+            request_body,  # body
+            None,  # request_guid
+            API_TIMEOUT,  # timeout in milliseconds
+        )
         
-        request_id = resp[0].RESPONSE['request_id']
+        # Content is a string with serialized JSON object
+        parsed_content = json.loads(resp["content"])
         
-        # Display the request ID for debugging purposes
-        if st.session_state.debug:
-            st.sidebar.text(f"Request ID: {request_id}")
-        
-        return resp[0].RESPONSE
+        # Check if the response is successful
+        if resp["status"] < 400:
+            # Return the content of the response as a JSON object
+            return parsed_content, None
+        else:
+            # Craft readable error message
+            error_msg = f"""
+🚨 An Analyst API error has occurred 🚨
+
+* response code: `{resp['status']}`
+* request-id: `{parsed_content.get('request_id', 'N/A')}`
+* error code: `{parsed_content.get('error_code', 'N/A')}`
+
+Message: ```{parsed_content.get('message', 'Unknown error')}```
+            """
+            return parsed_content, error_msg
     
     except Exception as e:
         error_msg = f"""
-        ❌ **Cortex Analyst Error**: {str(e)}
-        
-        **Semantic model path**: `{semantic_model_path}`
-        
-        **Common fixes**:
-        1. Ensure Cortex Analyst is enabled: `ALTER ACCOUNT SET CORTEX_ENABLED = TRUE;`
-        2. Grant Cortex permissions: `GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO USER <username>;`
-        3. Verify the semantic model file exists in the stage
-        4. Check your account region supports Cortex Analyst
+❌ **Error calling Cortex Analyst API**: {str(e)}
+
+**Possible solutions:**
+1. Ensure Cortex Analyst is enabled in your account
+2. Verify the semantic model file exists at: `@{st.session_state.selected_semantic_model_path}`
+3. Check you have the CORTEX_USER database role
+4. Confirm your account region supports Cortex Analyst
+
+**To test Cortex availability, run this SQL:**
+```sql
+SELECT SNOWFLAKE.CORTEX.COMPLETE('snowflake-arctic', 'Hello world');
+```
         """
-        
-        if st.session_state.debug:
-            error_msg += f"\n\n**Debug Info**: {json.dumps(request_body, indent=2)}"
-        
-        return {
-            "message": {
-                "content": [
-                    {
-                        "type": "text", 
-                        "text": error_msg
-                    }
-                ]
-            },
-            "request_id": "error"
-        }
+        return {}, error_msg
 
-def process_message(prompt: str) -> None:
-    """Processes a message and adds the response to the chat."""
-    st.session_state.messages.append(
-        {"role": "user", "content": [{"type": "text", "text": prompt}]}
-    )
+def process_message(content: str) -> None:
+    """
+    Process a new message and get response from Cortex Analyst.
     
+    Args:
+        content (str): The user's message content.
+    """
+    # Add user message to chat history
+    user_message = {
+        "role": "user", 
+        "content": [{"type": "text", "text": content}]
+    }
+    st.session_state.messages.append(user_message)
+    
+    # Display user message
     with st.chat_message("user"):
-        st.markdown(prompt)
+        st.markdown(content)
     
+    # Get response from Cortex Analyst
     with st.chat_message("assistant"):
-        with st.spinner("Generating response..."):
-            response = send_message(prompt=prompt)
-            content = response["message"]["content"]
-            display_content(content=content)
-    
-    st.session_state.messages.append({"role": "assistant", "content": content})
-
-def display_content(content: list, message_index: int = None) -> None:
-    """Displays a content item for a message."""
-    message_index = message_index or len(st.session_state.messages)
-    
-    for item in content:
-        if item["type"] == "text":
-            st.markdown(item["text"])
-        elif item["type"] == "suggestions":
-            with st.expander("Suggestions", expanded=True):
-                for suggestion_index, suggestion in enumerate(item["suggestions"]):
-                    if st.button(suggestion, key=f"{message_index}_{suggestion_index}"):
-                        st.session_state.active_suggestion = suggestion
-        elif item["type"] == "sql":
-            with st.expander("SQL Query", expanded=False):
-                st.code(item["statement"], language="sql")
-            with st.expander("Results", expanded=True):
-                with st.spinner("Running SQL..."):
-                    try:
-                        df = session.sql(item["statement"]).to_pandas()
-                        if df.empty:
-                            st.caption("No results")
-                        else:
-                            st.dataframe(df)
-                    except Exception as e:
-                        st.error(f"Error executing SQL: {str(e)}")
-                        st.code(item["statement"], language="sql")
-
-def page_config() -> None:
-    """Configures the Streamlit page."""
-    st.set_page_config(
-        page_title="Wealth Management Analytics Assistant",
-        page_icon="💰",
-        layout="wide",
-        initial_sidebar_state="expanded"
-    )
-
-def display_sidebar() -> None:
-    """Displays the sidebar configuration."""
-    with st.sidebar:
-        st.title("💰 Wealth Analytics")
-        st.markdown("---")
-        
-        st.subheader("Configuration")
-        if "database" not in st.session_state:
-            st.session_state.database = "CORTEX_ANALYST_DEMO"
-        if "schema" not in st.session_state:
-            st.session_state.schema = "WEALTH_MANAGEMENT"
-        if "stage" not in st.session_state:
-            st.session_state.stage = "RAW_DATA"
-        if "semantic_model_file" not in st.session_state:
-            st.session_state.semantic_model_file = "wealth_management.yaml"
+        with st.spinner("Analyzing..."):
+            # Call the Cortex Analyst API
+            response, error = get_analyst_response(st.session_state.messages)
             
-        st.selectbox(
-            "Select database:",
-            ["CORTEX_ANALYST_DEMO"],
-            index=0,
-            key="database"
-        )
-        st.selectbox(
-            "Select schema:",
-            ["WEALTH_MANAGEMENT"],
-            index=0,
-            key="schema"
-        )
-        st.selectbox(
-            "Select stage:",
-            ["RAW_DATA"],
-            index=0,
-            key="stage"
-        )
-        st.selectbox(
-            "Select semantic model file:",
-            ["wealth_management.yaml"],
-            index=0,
-            key="semantic_model_file"
-        )
-        
-        st.markdown("---")
-        st.subheader("Options")
-        if "debug" not in st.session_state:
-            st.session_state.debug = False
-        st.checkbox("Show request ID", key="debug")
-        
-        st.markdown("---")
-        st.subheader("Sample Questions")
-        st.markdown("""
-        Try asking questions like:
-        
-        **Portfolio Performance:**
-        - What was the total portfolio value last month?
-        - Which month had the highest portfolio performance?
-        - Show me portfolio values by client segment
-        
-        **Fee Analysis:**
-        - What are the total management fees this year?
-        - Which client segment pays the most in fees?
-        - Show me fee trends over time
-        
-        **Performance vs Target:**
-        - How are we performing against targets?
-        - Which advisor region is exceeding targets?
-        - Show me clients underperforming their benchmarks
-        
-        **Client Insights:**
-        - Which client segment has the highest portfolio value?
-        - How many clients do we have by segment?
-        - Show me portfolio distribution by advisor region
-        """)
+            if error:
+                st.error(error)
+                return
+            
+            # Extract the response content
+            if "message" in response:
+                assistant_message = response["message"]
+                content = assistant_message.get("content", [])
+                
+                for item in content:
+                    if item.get("type") == "text":
+                        st.markdown(item.get("text", ""))
+                    elif item.get("type") == "suggestions":
+                        suggestions = item.get("suggestions", [])
+                        if suggestions:
+                            st.markdown("**Suggested follow-up questions:**")
+                            for suggestion in suggestions:
+                                st.markdown(f"• {suggestion}")
+                    elif item.get("type") == "sql":
+                        with st.expander("📊 **Generated SQL Query**", expanded=False):
+                            st.code(item.get("statement", ""), language="sql")
+                
+                # Add assistant message to chat history
+                st.session_state.messages.append(assistant_message)
+                
+                # Display request ID for debugging
+                if "request_id" in response:
+                    st.caption(f"Request ID: {response['request_id']}")
+            else:
+                st.error("Unexpected response format from Cortex Analyst")
 
-def main() -> None:
-    """Main function for the Streamlit app."""
-    page_config()
-    ensure_session_state()
-    display_sidebar()
+# Sidebar configuration
+with st.sidebar:
+    st.header("⚙️ Configuration")
     
-    st.title("💰 Wealth Management Analytics Assistant")
-    st.markdown("Ask questions about portfolio performance, client segments, and advisor metrics using natural language.")
+    # Display current semantic model
+    st.markdown("**Current Semantic Model:**")
+    st.code(st.session_state.selected_semantic_model_path, language="text")
     
-    # Initialize chat messages
-    if "messages" not in st.session_state:
+    # Sample questions
+    st.markdown("**💡 Sample Questions:**")
+    sample_questions = [
+        "What are the top performing portfolio values by client segment?",
+        "Show me the management fees trends over time",
+        "Which advisors have the highest performing portfolios?",
+        "Compare portfolio performance vs targets by region",
+        "What's the average portfolio value for high net worth clients?"
+    ]
+    
+    for question in sample_questions:
+        if st.button(question, key=f"sample_{hash(question)}", use_container_width=True):
+            process_message(question)
+    
+    # Clear conversation button
+    if st.button("🗑️ Clear Conversation", use_container_width=True):
         st.session_state.messages = []
-        # Add welcome message
-        welcome_message = {
-            "role": "assistant",
-            "content": [
-                {
-                    "type": "text",
-                    "text": "👋 Welcome to the Wealth Management Analytics Assistant! I can help you analyze portfolio performance, client segments, advisor metrics, and fee structures. What would you like to know about your wealth management data?"
-                },
-                {
-                    "type": "suggestions",
-                    "suggestions": [
-                        "What questions can I ask?",
-                        "Show me total portfolio value by client segment",
-                        "What were our management fees last quarter?",
-                        "Which advisor region has the best performance?",
-                        "How are we performing against our targets?"
-                    ]
-                }
-            ]
-        }
-        st.session_state.messages.append(welcome_message)
-    
-    # Display chat messages
-    for message_index, message in enumerate(st.session_state.messages):
-        with st.chat_message(message["role"]):
-            display_content(message["content"], message_index)
-    
-    # Handle active suggestion
-    if "active_suggestion" in st.session_state:
-        process_message(st.session_state.active_suggestion)
-        del st.session_state.active_suggestion
-    
-    # Chat input
-    if prompt := st.chat_input("Ask a question about wealth management data..."):
-        process_message(prompt)
+        st.rerun()
 
-if __name__ == "__main__":
-    main() 
+# Main chat interface
+st.markdown("### 💬 Chat with your wealth management data")
+
+# Display chat history
+for message in st.session_state.messages:
+    role = message.get("role", "user")
+    
+    with st.chat_message(role):
+        if role == "user":
+            # Display user message
+            content = message.get("content", [])
+            for item in content:
+                if item.get("type") == "text":
+                    st.markdown(item.get("text", ""))
+        else:
+            # Display assistant message
+            content = message.get("content", [])
+            for item in content:
+                if item.get("type") == "text":
+                    st.markdown(item.get("text", ""))
+                elif item.get("type") == "suggestions":
+                    suggestions = item.get("suggestions", [])
+                    if suggestions:
+                        st.markdown("**Suggested follow-up questions:**")
+                        for suggestion in suggestions:
+                            st.markdown(f"• {suggestion}")
+                elif item.get("type") == "sql":
+                    with st.expander("📊 **Generated SQL Query**", expanded=False):
+                        st.code(item.get("statement", ""), language="sql")
+
+# Chat input
+if prompt := st.chat_input("Ask a question about your wealth management data..."):
+    process_message(prompt)
+
+# Footer
+st.markdown("---")
+st.markdown("**💡 Tips:**")
+st.markdown("• Ask specific questions about portfolio performance, client segments, or advisor metrics")
+st.markdown("• Use time-based queries like 'last month' or 'this quarter'")
+st.markdown("• Request comparisons between different client segments or advisor regions")
+st.markdown("• Ask for trends, totals, averages, or breakdowns of your data") 
