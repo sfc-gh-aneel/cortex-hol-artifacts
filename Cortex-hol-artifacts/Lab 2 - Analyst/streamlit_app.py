@@ -6,25 +6,57 @@ import pandas as pd
 # Get current Snowflake session
 session = snowpark_context.get_active_session()
 
+def ensure_session_state():
+    """Ensure all required session state variables are initialized."""
+    if "database" not in st.session_state:
+        st.session_state.database = "CORTEX_ANALYST_DEMO"
+    if "schema" not in st.session_state:
+        st.session_state.schema = "WEALTH_MANAGEMENT"
+    if "stage" not in st.session_state:
+        st.session_state.stage = "RAW_DATA"
+    if "semantic_model_file" not in st.session_state:
+        st.session_state.semantic_model_file = "wealth_management.yaml"
+    if "debug" not in st.session_state:
+        st.session_state.debug = False
+
 def send_message(prompt: str) -> dict:
     """Calls the REST API and returns the response."""
+    # Ensure session state is properly initialized
+    ensure_session_state()
+    
+    # Construct the semantic model file path
+    semantic_model_path = f"@{st.session_state.database}.{st.session_state.schema}.{st.session_state.stage}/{st.session_state.semantic_model_file}"
+    
     request_body = {
         "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}],
-        "semantic_model_file": f"@{st.session_state.database}.{st.session_state.schema}.{st.session_state.stage}/{st.session_state.semantic_model_file}",
+        "semantic_model_file": semantic_model_path,
     }
     
-    resp = session.sql(
-        "SELECT SNOWFLAKE.CORTEX.ANALYST(parse_json(%s)) as response",
-        params=[json.dumps(request_body)]
-    ).collect()
-    
-    request_id = resp[0].RESPONSE['request_id']
-    
-    # Display the request ID for debugging purposes
+    # Display debug information
     if st.session_state.debug:
-        st.sidebar.text(f"Request ID: {request_id}")
+        st.sidebar.text(f"Semantic Model Path: {semantic_model_path}")
+        st.sidebar.text(f"Request Body: {json.dumps(request_body, indent=2)}")
     
-    return resp[0].RESPONSE
+    try:
+        resp = session.sql(
+            "SELECT SNOWFLAKE.CORTEX.ANALYST(parse_json(?)) as response",
+            params=[json.dumps(request_body)]
+        ).collect()
+        
+        request_id = resp[0].RESPONSE['request_id']
+        
+        # Display the request ID for debugging purposes
+        if st.session_state.debug:
+            st.sidebar.text(f"Request ID: {request_id}")
+        
+        return resp[0].RESPONSE
+    
+    except Exception as e:
+        st.error(f"Error calling Cortex Analyst: {str(e)}")
+        st.error(f"Semantic model path: {semantic_model_path}")
+        if st.session_state.debug:
+            st.error(f"Full request body: {json.dumps(request_body, indent=2)}")
+        raise e
 
 def process_message(prompt: str) -> None:
     """Processes a message and adds the response to the chat."""
@@ -60,11 +92,15 @@ def display_content(content: list, message_index: int = None) -> None:
                 st.code(item["statement"], language="sql")
             with st.expander("Results", expanded=True):
                 with st.spinner("Running SQL..."):
-                    df = pd.read_sql(item["statement"], session)
-                    if df.empty:
-                        st.caption("No results")
-                    else:
-                        st.dataframe(df)
+                    try:
+                        df = session.sql(item["statement"]).to_pandas()
+                        if df.empty:
+                            st.caption("No results")
+                        else:
+                            st.dataframe(df)
+                    except Exception as e:
+                        st.error(f"Error executing SQL: {str(e)}")
+                        st.code(item["statement"], language="sql")
 
 def page_config() -> None:
     """Configures the Streamlit page."""
@@ -82,29 +118,44 @@ def display_sidebar() -> None:
         st.markdown("---")
         
         st.subheader("Configuration")
+        if "database" not in st.session_state:
+            st.session_state.database = "CORTEX_ANALYST_DEMO"
+        if "schema" not in st.session_state:
+            st.session_state.schema = "WEALTH_MANAGEMENT"
+        if "stage" not in st.session_state:
+            st.session_state.stage = "RAW_DATA"
+        if "semantic_model_file" not in st.session_state:
+            st.session_state.semantic_model_file = "wealth_management.yaml"
+            
         st.selectbox(
             "Select database:",
             ["CORTEX_ANALYST_DEMO"],
+            index=0,
             key="database"
         )
         st.selectbox(
             "Select schema:",
             ["WEALTH_MANAGEMENT"],
+            index=0,
             key="schema"
         )
         st.selectbox(
             "Select stage:",
             ["RAW_DATA"],
+            index=0,
             key="stage"
         )
         st.selectbox(
             "Select semantic model file:",
             ["wealth_management.yaml"],
+            index=0,
             key="semantic_model_file"
         )
         
         st.markdown("---")
         st.subheader("Options")
+        if "debug" not in st.session_state:
+            st.session_state.debug = False
         st.checkbox("Show request ID", key="debug")
         
         st.markdown("---")
@@ -136,6 +187,7 @@ def display_sidebar() -> None:
 def main() -> None:
     """Main function for the Streamlit app."""
     page_config()
+    ensure_session_state()
     display_sidebar()
     
     st.title("💰 Wealth Management Analytics Assistant")
