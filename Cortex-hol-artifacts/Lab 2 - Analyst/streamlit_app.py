@@ -56,9 +56,12 @@ def get_analyst_response(messages: List[Dict]) -> Tuple[Dict, Optional[str]]:
     # Validate conversation flow first
     clean_messages = validate_conversation_flow(messages)
     
+    # Filter out assistant messages - API only accepts user messages
+    user_only_messages = [msg for msg in clean_messages if msg.get("role") == "user"]
+    
     # Prepare the request body with the user's prompt
     request_body = {
-        "messages": clean_messages,
+        "messages": user_only_messages,
         "semantic_model_file": f"@{st.session_state.selected_semantic_model_path}",
     }
 
