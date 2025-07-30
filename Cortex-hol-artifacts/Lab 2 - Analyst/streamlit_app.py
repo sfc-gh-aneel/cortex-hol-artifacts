@@ -56,12 +56,19 @@ def get_analyst_response(messages: List[Dict]) -> Tuple[Dict, Optional[str]]:
     # Validate conversation flow first
     clean_messages = validate_conversation_flow(messages)
     
-    # Filter out assistant messages - API only accepts user messages
+    # API requires alternating roles and doesn't accept assistant messages
+    # Since it doesn't maintain context, just send the most recent user message
     user_only_messages = [msg for msg in clean_messages if msg.get("role") == "user"]
+    
+    # Only send the most recent user message to avoid role alternation issues
+    if user_only_messages:
+        latest_user_message = [user_only_messages[-1]]
+    else:
+        latest_user_message = []
     
     # Prepare the request body with the user's prompt
     request_body = {
-        "messages": user_only_messages,
+        "messages": latest_user_message,
         "semantic_model_file": f"@{st.session_state.selected_semantic_model_path}",
     }
 
