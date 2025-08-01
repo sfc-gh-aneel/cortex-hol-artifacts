@@ -179,11 +179,15 @@ def create_visualizations(df: pd.DataFrame, sql_query: str) -> None:
             cat_col = categorical_cols[0]
             num_col = numeric_cols[0]
             
+            # Clean the categorical data to handle whitespace and case issues
+            df_clean = df.copy()
+            df_clean[cat_col] = df_clean[cat_col].astype(str).str.strip().str.title()
+            
             # Aggregate data if needed
-            if len(df) > 20:  # If too many rows, aggregate
-                agg_df = df.groupby(cat_col)[num_col].sum().reset_index()
+            if len(df_clean) > 20:  # If too many rows, aggregate
+                agg_df = df_clean.groupby(cat_col)[num_col].sum().reset_index()
             else:
-                agg_df = df
+                agg_df = df_clean
             
             fig_bar = px.bar(agg_df, x=cat_col, y=num_col, 
                             title=f"{num_col} by {cat_col}")
@@ -208,7 +212,12 @@ def create_visualizations(df: pd.DataFrame, sql_query: str) -> None:
         # Pie chart for categorical data if appropriate
         if len(categorical_cols) >= 1 and len(df[categorical_cols[0]].unique()) <= 10:
             cat_col = categorical_cols[0]
-            value_counts = df[cat_col].value_counts()
+            
+            # Clean the categorical data to handle whitespace and case issues
+            df_clean = df.copy()
+            df_clean[cat_col] = df_clean[cat_col].astype(str).str.strip().str.title()
+            
+            value_counts = df_clean[cat_col].value_counts()
             
             fig_pie = px.pie(values=value_counts.values, names=value_counts.index,
                            title=f"Distribution of {cat_col}")
