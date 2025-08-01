@@ -217,10 +217,22 @@ def create_visualizations(df: pd.DataFrame, sql_query: str) -> None:
             df_clean = df.copy()
             df_clean[cat_col] = df_clean[cat_col].astype(str).str.strip().str.title()
             
-            value_counts = df_clean[cat_col].value_counts()
+            # Check if we're dealing with time-based data that has duplicates
+            has_date_cols = any('date' in col.lower() for col in df_clean.columns)
+            
+            if has_date_cols and len(df_clean[cat_col].value_counts()) != len(df_clean[cat_col].unique()):
+                # For time-based queries, show unique segments only (not multiple time periods)
+                unique_segments = df_clean[cat_col].unique()
+                # Create equal distribution for visualization (since we just want to show what segments exist)
+                value_counts = pd.Series([1] * len(unique_segments), index=unique_segments)
+                pie_title = f"Unique {cat_col} (Time-based Query)"
+            else:
+                # Normal count-based pie chart
+                value_counts = df_clean[cat_col].value_counts()
+                pie_title = f"Distribution of {cat_col}"
             
             fig_pie = px.pie(values=value_counts.values, names=value_counts.index,
-                           title=f"Distribution of {cat_col}")
+                           title=pie_title)
             st.plotly_chart(fig_pie, use_container_width=True)
 
 def process_message(content: str) -> None:
