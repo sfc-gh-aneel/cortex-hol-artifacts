@@ -1,12 +1,12 @@
-name: "wealth_management"
+name: "public"
 description: "Semantic model for wealth management and retirement planning analytics"
 
 tables:
   - name: daily_portfolio_performance
     description: "Daily portfolio performance metrics including values, fees, and targets"
     base_table:
-      database: "cortex_analyst_demo"
-      schema: "wealth_management"
+      database: "empower_poc_db"
+      schema: "public"
       table: "daily_portfolio_performance"
     primary_key:
       columns:
@@ -58,8 +58,8 @@ tables:
   - name: client
     description: "Client information including segment classification"
     base_table:
-      database: "cortex_analyst_demo"
-      schema: "wealth_management"
+      database: "empower_poc_db"
+      schema: "public"
       table: "client_dim"
     primary_key:
       columns:
@@ -87,8 +87,8 @@ tables:
   - name: advisor
     description: "Financial advisor information including regions, office locations, and individual advisor details"
     base_table:
-      database: "cortex_analyst_demo"
-      schema: "wealth_management"
+      database: "empower_poc_db"
+      schema: "public"
       table: "advisor_dim"
     primary_key:
       columns:
