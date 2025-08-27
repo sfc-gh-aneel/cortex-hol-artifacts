@@ -52,29 +52,20 @@ GRANT USAGE ON SCHEMA CORTEX_ANALYST_DEMO.WEALTH_MANAGEMENT TO ROLE SYSADMIN;
 
 -- LAB 1 SEARCH AGENT: Document Search
 -- Connects to the document search service from Lab 1
-CREATE CORTEX AGENT LAB1_DOCUMENT_SEARCH_AGENT
-    DESCRIPTION = 'Agent for searching through documents from Lab 1 document repository'
-    INSTRUCTIONS = 'You are an assistant that helps users search and find information in documents. 
-                   Use the document search service to find relevant content and provide helpful, 
-                   accurate responses based on the document contents.'
+CREATE OR REPLACE CORTEX AGENT LAB1_DOCUMENT_SEARCH_AGENT
+    COMMENT = 'Agent for searching through documents from Lab 1 document repository'
     TOOLS = (CORTEX_SEARCH_TUTORIAL_DB.PUBLIC.DOCUMENT_SEARCH_SERVICE);
 
 -- LAB 2 ANALYST AGENT: Wealth Management Analytics  
 -- Connects to the wealth management semantic model from Lab 2
-CREATE CORTEX AGENT LAB2_WEALTH_ANALYST_AGENT
-    DESCRIPTION = 'Agent for wealth management analytics and portfolio insights from Lab 2 data'
-    INSTRUCTIONS = 'You are a wealth management analyst assistant. Help users analyze portfolio data,
-                   client segments, advisor performance, and financial metrics. Generate SQL queries
-                   and provide insights based on the wealth management data model.'
+CREATE OR REPLACE CORTEX AGENT LAB2_WEALTH_ANALYST_AGENT
+    COMMENT = 'Agent for wealth management analytics and portfolio insights from Lab 2 data'
     TOOLS = (CORTEX_ANALYST_DEMO.WEALTH_MANAGEMENT.RAW_DATA);
 
 -- LAB 3 MULTIMODAL SEARCH AGENT: Enhanced Document Analysis
 -- Connects to the enhanced search service from Lab 3
-CREATE CORTEX AGENT LAB3_MULTIMODAL_SEARCH_AGENT  
-    DESCRIPTION = 'Agent for multimodal document analysis including text and image content from Lab 3'
-    INSTRUCTIONS = 'You are an advanced document analysis assistant that can process both text and
-                   visual content from documents. Help users extract insights from complex documents
-                   including charts, tables, and visual data representations.'
+CREATE OR REPLACE CORTEX AGENT LAB3_MULTIMODAL_SEARCH_AGENT  
+    COMMENT = 'Agent for multimodal document analysis including text and image content from Lab 3'
     TOOLS = (CORTEX_SEARCH_TUTORIAL_DB.PUBLIC.DOCS_SEARCH_SERVICE);
 
 -- ====================================================================
