@@ -1,0 +1,23 @@
+account: "<your_account>"
+user: "<your_user>"
+password: "<your_password>"
+role: "SYSADMIN"
+warehouse: "CORTEX_SEARCH_TUTORIAL_WH"
+
+# Services from prior labs
+lab1_search_service: "CORTEX_SEARCH_TUTORIAL_DB.PUBLIC.DOCUMENT_SEARCH_SERVICE"
+lab2_analyst:
+  database: "CORTEX_ANALYST_DEMO"
+  schema: "WEALTH_MANAGEMENT"
+  # Stage path to semantic model file used by Analyst (from Lab 2 app)
+  semantic_model_stage_path: "@CORTEX_ANALYST_DEMO.WEALTH_MANAGEMENT.RAW_DATA/wealth_management.yaml"
+  # Name to assign to the Analyst agent's underlying service (if needed)
+  service_name: "WEALTH_ANALYST_SERVICE"
+lab3_search_service: "CORTEX_SEARCH_TUTORIAL_DB.PUBLIC.DOCS_SEARCH_SERVICE"
+
+# Email agent configuration (requires a notification integration)
+email:
+  enabled: true
+  notification_integration: "YOUR_EMAIL_INTEGRATION"
+  recipient: "recipient@example.com"
+  task_schedule: "USING CRON 0 9 * * * UTC"
