@@ -1,129 +1,117 @@
-# Lab 4 - Cortex Agents
+# Lab 4 - Getting Started with Cortex Agents
 
-Create Snowflake Cortex Agents for existing services from Labs 1-3 and set up automated email summaries for Snowflake Intelligence.
+Create Cortex Agents for your existing Lab 1-3 services and use them in Snowflake Intelligence for natural language querying.
 
-## 📚 What You'll Create
+## Overview
 
-- **LAB1_SEARCH_AGENT**: Agent for Lab 1's document search service
-- **LAB2_ANALYST_AGENT**: Agent for Lab 2's wealth management analytics  
-- **LAB3_SEARCH_AGENT**: Agent for Lab 3's multimodal document parsing
-- **Email Infrastructure**: Automated daily summaries of Snowflake Intelligence activity
+This lab creates three Cortex Agents that connect to the services you built in previous labs:
 
-## 🚀 Quick Start
+- **LAB1_DOCUMENT_SEARCH_AGENT**: Natural language search through documents (Lab 1)
+- **LAB2_WEALTH_ANALYST_AGENT**: Natural language analytics on wealth management data (Lab 2)  
+- **LAB3_MULTIMODAL_SEARCH_AGENT**: Enhanced document analysis with visual content (Lab 3)
 
-1. **Open the notebook** `Lab4_Agents_Setup.ipynb` in Snowflake
-2. **Update configuration** in the first code cell with your service names
-3. **Run all cells sequentially** - the notebook guides you through everything
-4. **Test your agents** in Snowflake Intelligence
+## Prerequisites
 
-## 📋 Prerequisites
+✅ **Completed Labs 1, 2, and 3** with their Cortex services running  
+✅ **CORTEX_USER database role** granted to your user  
+✅ **Privileges** to create agents and access the lab databases  
 
-- ✅ Completed Labs 1, 2, and 3 with their Cortex services
-- ✅ Snowflake role with privileges to create agents, procedures, and tasks
-- ✅ (Optional) Email notification integration for automated summaries
+## Quick Start
 
-## 📖 Notebook Contents
+### 1. Run the Setup
 
-### Configuration & Setup
-- Easy-to-edit service names and database references
-- Environment setup and validation
-- Prerequisites checking
+Execute the setup script in Snowflake:
 
-### Agent Creation
-- Creates agents for all three lab services
-- Automatic binding to existing Cortex Search and Analyst services
-- Built-in verification and testing
+```sql
+-- Copy and paste the contents of setup.sql into a Snowflake worksheet
+-- Or upload and run the file directly
+```
 
-### Email Infrastructure
-- `SEND_ANALYSIS_EMAIL` stored procedure
-- `EMAIL_ANALYSIS_TASK` scheduled task for daily reports
-- Customizable email content and scheduling
+### 2. Access Snowflake Intelligence
 
-### Comprehensive Testing
-- Prerequisites validation
-- Agent functionality verification
-- Health check summary
-- Troubleshooting guidance
+1. Navigate to **Snowflake Intelligence** in your Snowflake interface
+2. You'll see your three new agents in the agent dropdown
+3. Select an agent and start asking questions!
 
-## 🎯 Using Your Agents
+### 3. Try Sample Questions
 
-Once created, your agents are immediately available in **Snowflake Intelligence**:
+**LAB1_DOCUMENT_SEARCH_AGENT** (Document Search):
+- "Find documents about retirement planning"
+- "What information is available about pension distributions?"
+- "Search for documents containing 401k information"
 
-### Sample Queries by Agent:
-
-**LAB1_SEARCH_AGENT** (Document Search):
-- "Find documents about pension considerations"
-- "Search for retirement planning guidelines"
-- "What documents mention 401k distributions?"
-
-**LAB2_ANALYST_AGENT** (Wealth Management):
+**LAB2_WEALTH_ANALYST_AGENT** (Wealth Analytics):
 - "What's the total portfolio value by client segment?"
-- "Show me performance vs target by advisor region"
-- "Which advisors have the highest average portfolio performance?"
+- "Show me the top performing advisors by region"
+- "How does portfolio performance compare to targets?"
 
-**LAB3_SEARCH_AGENT** (Multimodal Document Parsing):
-- "Analyze the 2023 factbook for investment trends"
-- "What are the key statistics in the factbook?"
-- "Find charts showing asset allocation data"
+**LAB3_MULTIMODAL_SEARCH_AGENT** (Enhanced Document Analysis):
+- "Analyze the investment trends in the 2023 factbook"
+- "What key statistics are shown in the charts?"
+- "Extract data from the visual elements in the documents"
 
-## 📧 Email Summaries
+## Files
 
-Configure automated daily summaries:
+- **`setup.sql`**: Complete setup script that creates all three agents
+- **`demo_queries.md`**: Additional sample queries for demonstrations
+- **`README.md`**: This file
 
-1. **Set up notification integration** in Snowflake
-2. **Update email settings** in the notebook configuration
-3. **Enable the task** when ready for automated emails
-4. **Customize content** by modifying the stored procedure
+## Architecture
 
-## 🔧 Troubleshooting
+```
+Lab 4 Agents Architecture
 
-### Common Issues:
+┌─────────────────────────────────────────────────────────────┐
+│                    Snowflake Intelligence                   │
+│                     (Natural Language UI)                  │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+                          ▼
+                    Cortex Agents
+                          │
+          ┌───────────────┼───────────────┐
+          ▼               ▼               ▼
+   Lab1 Agent      Lab2 Agent      Lab3 Agent
+      │               │               │
+      ▼               ▼               ▼
+  Cortex Search   Cortex Analyst   Cortex Search
+  (Documents)    (Wealth Data)    (Multimodal)
+      │               │               │
+      ▼               ▼               ▼
+  Lab 1 Docs      Lab 2 Data      Lab 3 Docs
+```
 
-**"Service not found"**
+## Troubleshooting
+
+**Agent not appearing in Snowflake Intelligence?**
+- Verify the agent was created: `SHOW CORTEX AGENTS;`
+- Check you have the CORTEX_USER role granted
+- Ensure you have access to the underlying services
+
+**"Service not found" errors?**
 - Verify Labs 1-3 services exist and are accessible
-- Check service names in configuration section
+- Check database and schema names in setup.sql match your environment
+- Confirm services are in the expected locations
 
-**"Permission denied"**
-- Ensure your role can create agents, procedures, and tasks
-- Check database/schema access permissions
+**Permission denied?**
+- Ensure CORTEX_USER database role is granted
+- Verify access to source databases (CORTEX_SEARCH_TUTORIAL_DB, CORTEX_ANALYST_DEMO)
+- Check your role has privileges to create agents
 
-**"Agent not appearing in Snowflake Intelligence"**
-- Run the verification cells in the notebook
-- Confirm agents were created successfully
+## Demo Tips
 
-**"Email not working"**
-- Verify notification integration is configured
-- Test the email procedure manually first
+1. **Start Simple**: Begin with basic questions to show each agent works
+2. **Show Progression**: Demonstrate how the same data can be accessed via natural language vs traditional SQL
+3. **Highlight Differences**: Show how each agent specializes in different types of data and queries
+4. **Interactive**: Let the audience suggest questions to ask the agents
 
-## 🏗️ Architecture
+## Next Steps
 
-```
-Lab 4 Agents
-├── LAB1_SEARCH_AGENT ──→ Lab 1 Cortex Search Service
-├── LAB2_ANALYST_AGENT ──→ Lab 2 Cortex Analyst Service  
-├── LAB3_SEARCH_AGENT ──→ Lab 3 Cortex Search Service
-└── Email Infrastructure
-    ├── SEND_ANALYSIS_EMAIL (procedure)
-    └── EMAIL_ANALYSIS_TASK (scheduled task)
-```
-
-## 📝 File Structure
-
-```
-Lab 4 - Agents/
-├── Lab4_Agents_Setup.ipynb    # Complete setup and documentation
-└── README.md                  # This file
-```
-
-## 🎉 Next Steps
-
-1. **Test your setup** using the notebook's testing cells
-2. **Try your agents** in Snowflake Intelligence
-3. **Customize email summaries** for your team's needs
-4. **Monitor usage** through task execution history
-
-Your agents are now ready to provide natural language access to all your Cortex services through Snowflake Intelligence!
+- Customize agent instructions for your specific use cases
+- Add more sophisticated sample questions
+- Integrate agents into applications using the Snowflake APIs
+- Monitor agent usage and performance
 
 ---
 
-**Need help?** The notebook includes comprehensive testing and troubleshooting sections to guide you through any issues.
+**Based on**: [Snowflake Quickstart - Getting Started with Cortex Agents](https://quickstarts.snowflake.com/guide/getting_started_with_cortex_agents/)
