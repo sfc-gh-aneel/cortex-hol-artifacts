@@ -2,83 +2,94 @@
 
 Use these sample queries to demonstrate the capabilities of each agent in Snowflake Intelligence.
 
+## 🚀 Quick Demo Starters (One per Service)
+
+**LAB1 (Document Search)**: *"What are the QACA auto-enrollment requirements for 401k plans?"*
+
+**LAB2 (Analytics)**: *"What's the total portfolio value by client segment?"*
+
+**LAB3 (Multimodal)**: *"What are the exact asset allocation percentages shown in the 2023 ICI Fact Book pie charts?"*
+
+---
+
 ## LAB1_DOCUMENT_SEARCH_AGENT
-*For searching through documents from Lab 1*
+*Retirement & Pension Document Specialist - Hits Cortex Search Service*
 
-### Basic Document Search
-- "Find documents about retirement planning"
-- "What documents mention 401k distributions?"
-- "Search for information about pension considerations"
-- "What documents discuss QACA provisions?"
+### Regulatory & Compliance Questions
+- "What are the QACA auto-enrollment requirements for 401k plans?"
+- "Find information about mandatory distribution rules for retirement plans"
+- "What are the fiduciary requirements mentioned in the trust agreement documents?"
+- "What does the wrap document say about summary plan description requirements?"
 
-### Specific Information Extraction
-- "What are the key requirements for 401k plan administration?"
-- "Find information about mandatory distributions"
-- "What documents contain information about trust agreements?"
-- "Search for sample wrap document requirements"
+### Plan Administration Questions  
+- "What are the key provisions for 401k loan distributions?"
+- "Find details about pension plan participation eligibility"
+- "What compliance requirements are outlined for retirement plan sponsors?"
+- "Search for information about ERISA filing requirements"
 
-### Document Summaries
-- "Summarize the main points from the retirement plan documents"
-- "What are the common themes across all the documents?"
-- "Give me an overview of the pension-related content"
+### Document-Specific Searches
+- "What specific forms are mentioned in the retirement planning documents?"
+- "Find references to IRS regulations in the pension documentation"
+- "What are the sample provisions included in the wrap document?"
+- "Search for any mention of audit requirements in the plan documents"
 
 ---
 
 ## LAB2_WEALTH_ANALYST_AGENT
-*For analytics on wealth management data from Lab 2*
+*Portfolio Analytics Specialist - Hits Cortex Analyst Service*
 
-### Portfolio Analytics
+### Portfolio Metrics & KPIs
 - "What's the total portfolio value by client segment?"
-- "Show me the portfolio performance vs target by advisor region"
-- "Which advisors have the highest average portfolio performance?"
-- "What's the average portfolio value for High Net Worth clients?"
+- "Show me average portfolio performance vs target by advisor region"
+- "What are the total management fees collected by client segment this year?"
+- "Which client segment has the highest average portfolio value?"
 
-### Client Segmentation
-- "How are our clients distributed across different segments?"
-- "What's the breakdown of portfolio values by client type?"
-- "Show me client demographics by advisor region"
-- "Which client segments are growing the fastest?"
+### Advisor Performance Analytics
+- "List the top 5 advisors by portfolio performance in the Northeast region"
+- "What's the average portfolio value managed by advisors with over 10 years experience?"
+- "Show me advisor performance metrics grouped by office location"
+- "Which advisor region has the best performance vs target ratios?"
 
-### Advisor Performance
-- "Who are our top performing advisors?"
-- "Show me advisor performance by region"
-- "What's the average years of experience for advisors in each region?"
-- "Which advisors manage the largest portfolios?"
+### Client Segmentation Analysis
+- "How many clients are in each client segment?"
+- "What's the portfolio value distribution across High Net Worth vs Ultra High Net Worth clients?"
+- "Show me the breakdown of Conservative Investor vs Growth Investor portfolio performance"
+- "Which client segments have portfolios above $2 million?"
 
-### Trend Analysis
-- "How has portfolio performance changed over time?"
-- "Show me monthly trends in management fees"
-- "What's the trend in portfolio values by segment?"
-- "How do performance targets compare to actual results?"
+### Time-Based Analytics
+- "What was the lowest daily portfolio value each month and on what date?"
+- "Show me daily profit trends (portfolio value minus management fees) for this quarter"
+- "What's the monthly performance vs target trend for the current year?"
+- "Which month had the highest total management fees collected?"
 
 ---
 
 ## LAB3_MULTIMODAL_SEARCH_AGENT
-*For enhanced document analysis with visual content from Lab 3*
+*Investment Intelligence Specialist - Hits Enhanced Cortex Search Service*
 
-### Factbook Analysis
-- "Analyze the key investment trends in the 2023 factbook"
-- "What are the main statistics shown in the factbook charts?"
-- "Extract the asset allocation data from the visual elements"
-- "What investment company trends are highlighted?"
+### Asset Allocation & Fund Data Extraction
+- "What are the exact asset allocation percentages shown in the 2023 ICI Fact Book pie charts?"
+- "Extract the total net assets figures for mutual funds vs ETFs from the statistical tables"
+- "What are the specific numbers for domestic vs international equity allocations shown in the charts?"
+- "Find the precise asset breakdown percentages for fixed income investments in the visual data"
 
-### Chart and Table Extraction
-- "What numerical data can you extract from the charts?"
-- "Describe the trends shown in the performance graphs"
-- "What are the key figures from the statistical tables?"
-- "Extract specific percentages from the pie charts"
+### Investment Company Statistics
+- "What are the total registered investment company assets figures shown in the 2023 data?"
+- "Extract the exact flow data (inflows/outflows) numbers from the factbook charts"
+- "What specific percentages are shown for money market fund assets vs total fund assets?"
+- "Find the numerical data for ETF growth rates displayed in the trend graphs"
 
-### Visual Content Insights
-- "What insights can you derive from the visual representations?"
-- "Compare the data shown in different chart types"
-- "What patterns do you see in the graphical data?"
-- "Summarize the key takeaways from the visual content"
+### Visual Chart & Table Analysis  
+- "What are the exact values displayed in the 'Net Assets by Investment Objective' table?"
+- "Extract the specific trend data points from the 5-year performance line charts"
+- "What numerical values are shown in the bar charts comparing fund categories?"
+- "Find the precise statistics displayed in the 'Investment Company Assets by Type' breakdown"
 
-### Comprehensive Analysis
-- "Provide a comprehensive analysis of the 2023 investment landscape"
-- "What are the most significant findings in the factbook?"
-- "Compare different investment categories based on the visual data"
-- "What recommendations can you make based on the trends shown?"
+### Temporal Trend Data
+- "What are the year-over-year growth percentages shown in the factbook trend analysis?"
+- "Extract the specific quarterly flow data from the time series charts"
+- "What exact performance metrics are displayed for the 2019-2023 period?"
+- "Find the precise market share percentages shown in the historical comparison charts"
 
 ---
 
