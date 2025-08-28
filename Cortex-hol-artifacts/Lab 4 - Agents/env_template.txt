@@ -1,0 +1,18 @@
+# Snowflake Cortex MCP Server Configuration
+# Copy this file to .env and fill in your actual values
+
+# Snowflake Account URL (replace with your account)
+# Format: https://your-account.snowflakecomputing.com
+SNOWFLAKE_ACCOUNT_URL=https://your-account.snowflakecomputing.com
+
+# Snowflake Programmatic Access Token
+# Generate this in Snowflake UI: Admin > Users & Roles > Users > [Your User] > Access Tokens
+SNOWFLAKE_PAT=your_pat_token_here
+
+# Semantic Model File Path (from Lab 2)
+# This should point to your wealth management YAML file
+SEMANTIC_MODEL_FILE=@CORTEX_ANALYST_DEMO.WEALTH_MANAGEMENT.RAW_DATA/wealth_management.yaml
+
+# Cortex Search Service (from Lab 1)
+# This should be your document search service name
+CORTEX_SEARCH_SERVICE=CORTEX_ANALYST_DEMO.WEALTH_MANAGEMENT.DOCUMENT_SEARCH_SERVICE

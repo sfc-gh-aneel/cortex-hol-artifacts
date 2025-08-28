@@ -1,138 +1,187 @@
-# Demo Queries for Lab 4 Cortex Agents
+# Demo Queries for Lab 4 - Cortex Agents
 
-Use these sample queries to demonstrate the capabilities of each agent in Snowflake Intelligence.
+This document provides example queries to test each service integrated with your MCP server.
 
-## 🚀 Quick Demo Starters (One per Service)
+## 🎯 Quick Test Queries
 
-**LAB1 (Document Search)**: *"What are the QACA auto-enrollment requirements for 401k plans?"*
+### Basic Connectivity Test
+```
+test query
+```
+*Tests basic MCP server functionality*
 
-**LAB2 (Analytics)**: *"What's the total portfolio value by client segment?"*
+## 📊 Cortex Analyst Queries (Structured Data Analysis)
 
-**LAB3 (Multimodal)**: *"What are the exact asset allocation percentages shown in the 2023 ICI Fact Book pie charts?"*
+These queries use the wealth management semantic model from Lab 2:
 
----
+### Performance Analysis
+```
+How does performance vs target vary by advisor region?
+```
+*Expected: SQL generation, data analysis, regional performance breakdown*
 
-## LAB1_DOCUMENT_SEARCH_AGENT
-*Retirement & Pension Document Specialist - Hits Cortex Search Service*
+```
+Show me top performing advisors by region
+```
+*Expected: Ranking analysis with advisor performance metrics*
 
-### Regulatory & Compliance Questions
-- "What are the QACA auto-enrollment requirements for 401k plans?"
-- "Find information about mandatory distribution rules for retirement plans"
-- "What are the fiduciary requirements mentioned in the trust agreement documents?"
-- "What does the wrap document say about summary plan description requirements?"
+```
+What are the portfolio performance trends over time?
+```
+*Expected: Time series analysis of portfolio values*
 
-### Plan Administration Questions  
-- "What are the key provisions for 401k loan distributions?"
-- "Find details about pension plan participation eligibility"
-- "What compliance requirements are outlined for retirement plan sponsors?"
-- "Search for information about ERISA filing requirements"
+### Client Segmentation
+```
+Analyze client performance by advisor region and segment
+```
+*Expected: Multi-dimensional analysis of client data*
 
-### Document-Specific Searches
-- "What specific forms are mentioned in the retirement planning documents?"
-- "Find references to IRS regulations in the pension documentation"
-- "What are the sample provisions included in the wrap document?"
-- "Search for any mention of audit requirements in the plan documents"
+```
+Which advisor regions have the highest average portfolio values?
+```
+*Expected: Regional comparison with statistical analysis*
 
----
+## 🔍 Cortex Search Queries (Document Search)
 
-## LAB2_WEALTH_ANALYST_AGENT
-*Portfolio Analytics Specialist - Hits Cortex Analyst Service*
+These queries search through retirement plan documents from Lab 1:
 
-### Portfolio Metrics & KPIs
-- "What's the total portfolio value by client segment?"
-- "Show me average portfolio performance vs target by advisor region"
-- "What are the total management fees collected by client segment this year?"
-- "Which client segment has the highest average portfolio value?"
+### Retirement Plan Information
+```
+Find information about retirement plans and 401k requirements
+```
+*Expected: Document excerpts with citations about 401k plans*
 
-### Advisor Performance Analytics
-- "List the top 5 advisors by portfolio performance in the Northeast region"
-- "What's the average portfolio value managed by advisors with over 10 years experience?"
-- "Show me advisor performance metrics grouped by office location"
-- "Which advisor region has the best performance vs target ratios?"
+```
+When would a plan participant need to execute a salary reduction agreement?
+```
+*Expected: Specific information about salary reduction timing and requirements*
 
-### Client Segmentation Analysis
-- "How many clients are in each client segment?"
-- "What's the portfolio value distribution across High Net Worth vs Ultra High Net Worth clients?"
-- "Show me the breakdown of Conservative Investor vs Growth Investor portfolio performance"
-- "Which client segments have portfolios above $2 million?"
+```
+What are the vesting provisions for retirement plans?
+```
+*Expected: Details about vesting schedules and requirements*
 
-### Time-Based Analytics
-- "What was the lowest daily portfolio value each month and on what date?"
-- "Show me daily profit trends (portfolio value minus management fees) for this quarter"
-- "What's the monthly performance vs target trend for the current year?"
-- "Which month had the highest total management fees collected?"
+### Plan Administration
+```
+What are the employer contribution requirements for 401k plans?
+```
+*Expected: Information about employer matching and contribution rules*
 
----
+```
+How do plan participants make election changes?
+```
+*Expected: Process information for changing contribution elections*
 
-## LAB3_MULTIMODAL_SEARCH_AGENT
-*Investment Intelligence Specialist - Hits Enhanced Cortex Search Service*
+```
+What happens if a plan loses qualified status?
+```
+*Expected: Information about plan compliance and consequences*
 
-### Asset Allocation & Fund Data Extraction
-- "What are the exact asset allocation percentages shown in the 2023 ICI Fact Book pie charts?"
-- "Extract the total net assets figures for mutual funds vs ETFs from the statistical tables"
-- "What are the specific numbers for domestic vs international equity allocations shown in the charts?"
-- "Find the precise asset breakdown percentages for fixed income investments in the visual data"
+## 🔄 Mixed Queries (Multiple Services)
 
-### Investment Company Statistics
-- "What are the total registered investment company assets figures shown in the 2023 data?"
-- "Extract the exact flow data (inflows/outflows) numbers from the factbook charts"
-- "What specific percentages are shown for money market fund assets vs total fund assets?"
-- "Find the numerical data for ETF growth rates displayed in the trend graphs"
+These queries may trigger both analyst and search capabilities:
 
-### Visual Chart & Table Analysis  
-- "What are the exact values displayed in the 'Net Assets by Investment Objective' table?"
-- "Extract the specific trend data points from the 5-year performance line charts"
-- "What numerical values are shown in the bar charts comparing fund categories?"
-- "Find the precise statistics displayed in the 'Investment Company Assets by Type' breakdown"
+### Comprehensive Analysis
+```
+Analyze advisor performance by region and find relevant retirement plan documentation
+```
+*Expected: Both SQL analysis and document search results*
 
-### Temporal Trend Data
-- "What are the year-over-year growth percentages shown in the factbook trend analysis?"
-- "Extract the specific quarterly flow data from the time series charts"
-- "What exact performance metrics are displayed for the 2019-2023 period?"
-- "Find the precise market share percentages shown in the historical comparison charts"
+```
+Show me performance metrics and any related compliance requirements
+```
+*Expected: Data analysis plus regulatory information*
 
----
+## 📧 Email Integration Queries
 
-## Demo Flow Suggestions
+Test the email functionality (requires setup_agents.sql to be executed):
 
-### 1. Start with Simple Queries
-Begin with basic questions that clearly show each agent working:
-- LAB1: "Find documents about retirement planning"
-- LAB2: "What's the total portfolio value by client segment?"
-- LAB3: "What are the key statistics in the 2023 factbook?"
+### Simple Email
+```
+Send an email to adam.neel@snowflake.com with a summary of today's analysis
+```
+*Expected: Email sent with analysis summary*
 
-### 2. Show Specialization
-Demonstrate how each agent specializes in different data types:
-- LAB1: Unstructured document search
-- LAB2: Structured data analytics with SQL generation
-- LAB3: Multimodal content analysis
+### Report Email
+```
+Email the performance analysis results to the team
+```
+*Expected: Formatted email with query results*
 
-### 3. Progressive Complexity
-Move from simple to more complex queries:
-- Basic information retrieval
-- Analytical questions requiring calculations
-- Comparative analysis across categories
-- Trend identification and insights
+## 🚀 Advanced Queries
 
-### 4. Interactive Demo
-- Let the audience suggest questions
-- Show how natural language gets translated to appropriate queries
-- Demonstrate error handling for unclear questions
-- Show how agents guide users toward better questions
+### Complex Analysis
+```
+Compare performance vs target across all advisor regions, show the variance, and identify outliers. Also find any relevant documentation about performance benchmarks.
+```
+*Expected: Complex SQL with statistical analysis plus document search*
 
-### 5. Cross-Agent Comparison
-Show how different agents might handle similar themes:
-- LAB1: "Find documents about investment strategies"
-- LAB2: "Show me investment performance by strategy"  
-- LAB3: "Analyze investment strategy trends in the factbook"
+### Multi-Step Workflow
+```
+Analyze portfolio performance by region, identify the top performing region, and send an email to adam.neel@snowflake.com with the results
+```
+*Expected: Analysis → identification → email workflow*
 
----
+## 🎪 Demo Script
 
-## Tips for Effective Demos
+For a complete demonstration, run these queries in sequence:
 
-1. **Prepare your environment**: Ensure all services are running and agents are created
-2. **Test queries beforehand**: Verify sample queries work as expected
-3. **Have backup questions**: Prepare alternatives if certain queries don't work perfectly
-4. **Explain the process**: Show how natural language gets transformed into search/SQL
-5. **Highlight the value**: Emphasize how this democratizes data access
-6. **Show real-world application**: Connect demo queries to actual business scenarios
+1. **Start Simple**: `test query` *(verify connectivity)*
+2. **Show Analysis**: `How does performance vs target vary by advisor region?` *(demonstrate analyst)*
+3. **Show Search**: `Find information about 401k salary reduction agreements` *(demonstrate search)*
+4. **Show Integration**: `Email adam.neel@snowflake.com about the latest performance analysis` *(demonstrate email)*
+5. **Show Power**: `Analyze top performing advisors and find compliance documentation` *(demonstrate combination)*
+
+## 🔧 Troubleshooting Queries
+
+If you encounter issues, try these diagnostic queries:
+
+### Test Individual Services
+```
+Search for retirement plan information
+```
+*Should only trigger search service*
+
+```
+Show me advisor regions
+```
+*Should only trigger analyst service*
+
+### Error Testing
+```
+Send email to invalid@external.com
+```
+*Should fail gracefully with proper error message*
+
+## 📝 Response Format Examples
+
+### Successful Analyst Response
+```json
+{
+  "text": "Analysis interpretation...",
+  "sql": "SELECT ...",
+  "results": {...},
+  "citations": []
+}
+```
+
+### Successful Search Response
+```json
+{
+  "text": "Document information...",
+  "citations": [{"source_id": 1, "doc_id": "..."}],
+  "sql": "",
+  "results": null
+}
+```
+
+### Error Response
+```json
+{
+  "text": "Error description...",
+  "error": "Detailed error message",
+  "citations": [],
+  "sql": "",
+  "results": null
+}
+```
