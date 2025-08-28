@@ -57,6 +57,8 @@ Execute the setup script in Snowflake:
 - **`demo_queries.md`**: Sample queries for demonstrations targeting each service
 - **`create_pat_token.sql`**: Guide for creating Programmatic Access Tokens
 - **`test_pat_connection.py`**: Python script to test PAT authentication
+- **`mcp_setup_guide.md`**: Complete MCP development environment setup guide
+- **`setup_mcp_env.sh`**: Automated script for MCP environment setup
 - **`README.md`**: This file
 
 ## Architecture
@@ -108,9 +110,24 @@ Lab 4 Agents Architecture
 3. **Highlight Differences**: Show how each agent specializes in different types of data and queries
 4. **Interactive**: Let the audience suggest questions to ask the agents
 
-## API Access & Programmatic Use
+## Development Environment Setup
 
-### Creating a Programmatic Access Token (PAT)
+### MCP (Model Context Protocol) Development
+
+For MCP integrations and development:
+
+1. **Quick Setup**: Run the automated script
+   ```bash
+   ./setup_mcp_env.sh
+   ```
+
+2. **Manual Setup**: Follow the detailed guide in `mcp_setup_guide.md`
+
+3. **Requirements:**
+   - Python 3.10+ ✅ (Installed: Python 3.11.13)
+   - MCP SDK 1.2.0+ ✅ (Installed: MCP SDK 1.13.1)
+
+### Programmatic Access Token (PAT) Setup
 
 For API integrations and programmatic access:
 
