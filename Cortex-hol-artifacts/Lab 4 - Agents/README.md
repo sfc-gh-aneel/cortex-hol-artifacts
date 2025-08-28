@@ -15,6 +15,7 @@ This lab creates three Cortex Agents that connect to the services you built in p
 ✅ **Completed Labs 1, 2, and 3** with their Cortex services running  
 ✅ **CORTEX_USER database role** granted to your user  
 ✅ **Privileges** to create agents and access the lab databases  
+✅ **Programmatic Access Token (PAT)** for API connections (optional for basic setup)
 
 ## Quick Start
 
@@ -53,7 +54,9 @@ Execute the setup script in Snowflake:
 ## Files
 
 - **`setup.sql`**: Complete setup script that creates all three agents
-- **`demo_queries.md`**: Additional sample queries for demonstrations
+- **`demo_queries.md`**: Sample queries for demonstrations targeting each service
+- **`create_pat_token.sql`**: Guide for creating Programmatic Access Tokens
+- **`test_pat_connection.py`**: Python script to test PAT authentication
 - **`README.md`**: This file
 
 ## Architecture
@@ -104,6 +107,30 @@ Lab 4 Agents Architecture
 2. **Show Progression**: Demonstrate how the same data can be accessed via natural language vs traditional SQL
 3. **Highlight Differences**: Show how each agent specializes in different types of data and queries
 4. **Interactive**: Let the audience suggest questions to ask the agents
+
+## API Access & Programmatic Use
+
+### Creating a Programmatic Access Token (PAT)
+
+For API integrations and programmatic access:
+
+1. **Create PAT**: Follow the steps in `create_pat_token.sql`
+2. **Test Connection**: Run `python test_pat_connection.py`
+3. **Use in Applications**: Reference the Python examples for API connections
+
+### Example API Usage
+
+```python
+import snowflake.connector
+
+# Connect using PAT
+ctx = snowflake.connector.connect(
+    user='your_username',
+    account='your_account',
+    authenticator='oauth',
+    token='your_pat_token'
+)
+```
 
 ## Next Steps
 
