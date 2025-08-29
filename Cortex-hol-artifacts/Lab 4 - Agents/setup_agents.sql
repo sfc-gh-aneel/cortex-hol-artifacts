@@ -70,6 +70,7 @@ ENABLED = TRUE
 ALLOWED_RECIPIENTS = (
     -- IMPORTANT: Replace these with your actual allowed email recipients
     -- Add all email addresses that should be able to receive emails from this tool
+    -- MAKE SURE YOUR EMAIL IS VALIDATED ITH SNOFLAKE AS WELL
     'adam.neel@snowflake.com'
 );
 
